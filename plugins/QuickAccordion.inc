@@ -74,10 +74,7 @@ class QuickAccordion extends QuickRenderer {
     $options = $settings['options'];
     $attached = array(
       'library' => array(
-        array('system', 'ui.accordion'),
-      ),
-      'js' => array(
-        array('data' => backdrop_get_path('module', 'quicktabs') . '/js/qt_accordion.js'),
+        array('quicktabs', 'quicktabs.accordion'),
       ),
     );
 
@@ -92,8 +89,7 @@ class QuickAccordion extends QuickRenderer {
     }
 
     if ($options['history']) {
-      $attached['library'][] = array('quicktabs', 'jquery.bbq');
-      $attached['js'][] = array('data' => backdrop_get_path('module', 'quicktabs') . '/js/quicktabs_bbq.js');
+      $attached['library'][] = array('quicktabs', 'quicktabs.bbq');
     }
 
     $name = $this->quickset->getName();

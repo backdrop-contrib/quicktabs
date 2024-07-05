@@ -101,12 +101,8 @@ class QuickQuicktabs extends QuickRenderer {
    */
   protected function add_attached() {
     $attached = array(
-      'css' => array(
-        array('data' => backdrop_get_path('module', 'quicktabs') .'/css/quicktabs.css'),
-      ),
-      'js' => array(
-        array('data' => backdrop_get_path('module', 'quicktabs') . '/js/quicktabs.js'),
-        array('data' => 'core/misc/progress.js', 'weight' => JS_LIBRARY),
+      'library' => array(
+        array('quicktabs', 'quicktabs.tabs'),
       ),
     );
     $settings = $this->quickset->getSettings();

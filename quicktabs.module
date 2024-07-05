@@ -183,12 +183,75 @@ function quicktabs_library_info() {
   $libraries['jquery.bbq'] = array(
     'title' => 'Enables bookmarkable #hash history.',
     'website' => 'https://github.com/cowboy/jquery-bbq',
-    'version' => BACKDROP_VERSION,
+    'version' => 1.0,
     'js' => array(
       $module_path . '/js/jquery.ba-bbq.js' => array(),
     ),
     'dependencies' => array(
       array('system', 'jquery'),
+    ),
+  );
+
+  $libraries['quicktabs.bbq'] = array(
+    'title' => 'Enables bookmarkable #hash history.',
+    'version' => 1.0,
+    'js' => array(
+      $module_path . '/js/quicktabs_bbq.js' => array(),
+    ),
+    'dependencies' => array(
+      array('quicktabs', 'jquery.bbq'),
+    ),
+  );
+
+  $libraries['quicktabs.tabs'] = array(
+    'title' => 'Quicktabs Tabs',
+    'version' => 1.0,
+    'css' => array(
+      $module_path . '/css/quicktabs.css' => array(),
+    ),
+    'js' => array(
+      $module_path . '/js/quicktabs.js' => array(),
+    ),
+    'dependencies' => array(
+      array('system', 'backdrop.progress'),
+    ),
+  );
+
+  $libraries['quicktabs.ui_tabs'] = array(
+    'title' => 'Quicktabs UI Tabs',
+    'version' => 1.0,
+    'js' => array(
+      $module_path . '/js/qt_ui_tabs.js' => array(),
+    ),
+    'dependencies' => array(
+      array('system', 'ui.tabs'),
+      array('quicktabs', 'jquery.bbq'),
+    ),
+  );
+
+  $libraries['quicktabs.admin'] = array(
+    'title' => 'Quicktabs admin',
+    'version' => 1.0,
+    'css' => array(
+      $module_path . '/css/quicktabs-admin.css' => array(),
+    ),
+    'js' => array(
+      $module_path . '/js/quicktabs_form.js' => array(),
+    ),
+    'icons' => array(
+      'plus',
+      'minus',
+    ),
+  );
+
+  $libraries['quicktabs.accordion'] = array(
+    'title' => 'Quicktabs accordion',
+    'version' => 1.0,
+    'js' => array(
+      $module_path . '/js/qt_accordion.js' => array(),
+    ),
+    'dependencies' => array(
+      array('system', 'ui.accordion'),
     ),
   );
 

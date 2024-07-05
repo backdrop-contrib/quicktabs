@@ -402,8 +402,7 @@ function theme_quicktabs_admin_form_tabs($variables) {
     '#attributes' => array('id' => 'qt-tablist-table'),
     '#weight' => -1,
   );
-  $build['#attached']['css'][] = backdrop_get_path('module', 'quicktabs') . '/css/quicktabs-admin.css';
-  $build['#attached']['js'][] = backdrop_get_path('module', 'quicktabs') . '/js/quicktabs_form.js';
+  $build['#attached']['library'][] = array('quicktabs', 'quicktabs.admin');
 
   $output = backdrop_render($build);
   return $output;

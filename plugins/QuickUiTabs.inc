@@ -86,11 +86,7 @@ class QuickUiTabs extends QuickRenderer {
 
     $attached = array(
       'library' => array(
-        array('system', 'ui.tabs'),
-        array('quicktabs', 'jquery.bbq'),
-      ),
-      'js' => array(
-        array('data' => backdrop_get_path('module', 'quicktabs') . '/js/qt_ui_tabs.js', 'weight' => JS_DEFAULT + 1),
+        array('quicktabs', 'quicktabs.ui_tabs'),
       ),
     );
 
@@ -105,8 +101,7 @@ class QuickUiTabs extends QuickRenderer {
     }
 
     if ($options['history']) {
-      $attached['library'][] = array('quicktabs', 'jquery.bbq');
-      $attached['js'][] = array('data' => backdrop_get_path('module', 'quicktabs') . '/js/quicktabs_bbq.js', 'weight' => JS_DEFAULT);
+      $attached['library'][] = array('quicktabs', 'quicktabs.bbq');
     }
 
     $name = $this->quickset->getName();
