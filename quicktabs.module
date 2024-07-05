@@ -329,6 +329,7 @@ function quicktabs_load($name) {
  */
 function quicktabs_load_multiple() {
   $config_names = config_get_names_with_prefix('quicktabs.quicktab.');
+  $qts = array();
   foreach ($config_names as $config_name) {
     $config = config($config_name);
     $qts[$config->get('machine_name')] = (object) $config->getData();
