@@ -167,7 +167,7 @@ function _quicktabs_admin_main_form($form_state, &$qt) {
       $renderer_options[$name] = $name;
 
       // Get the renderer's options form elements
-      $renderer_form_options[$name] = $class::optionsForm(array($qt));
+      $renderer_form_options[$name] = $class::optionsForm($qt);
     }
   }
   ksort($renderer_options);

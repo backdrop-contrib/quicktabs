@@ -108,7 +108,7 @@ class QuickNodeContent extends QuickContent {
           }
           $nstruct = node_view($node, $buildmode);
           if ($item['hide_title']) {
-            $nstruct['#node']->title = NULL;
+            $nstruct['#node']->title = '';
           }
           $output = $nstruct;
         }

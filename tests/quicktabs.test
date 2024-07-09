@@ -58,7 +58,22 @@ class QuicktabsAdminTestCase extends BackdropWebTestCase {
     );
     // Now add on the tabs info to the $saved array - it's the same as what we
     // put in the edit form but we need it in proper array format.
-    $saved['tabs'] = array(0 => array('type' => 'node', 'nid' => 1, 'view_mode' => 'full', 'title' => $tab_title_first, 'weight' => 0), 1 => array('type' => 'node', 'nid' => 2, 'view_mode' => 'full', 'title' => $tab_title_second, 'weight' => 1));
+    $saved['tabs'] = array(
+      0 => array(
+        'type' => 'node',
+        'nid' => 1,
+        'view_mode' => 'full',
+        'title' => $tab_title_first,
+        'weight' => 0
+      ),
+      1 => array(
+        'type' => 'node',
+        'nid' => 2,
+        'view_mode' => 'full',
+        'title' => $tab_title_second,
+        'weight' => 1
+      )
+    );
     $this->backdropPost('admin/structure/quicktabs/add', $edit, t('Save'));
 
     // Check that the quicktabs object is in the database.
@@ -101,7 +116,24 @@ class QuicktabsAdminTestCase extends BackdropWebTestCase {
       'tabs[1][node][view_mode]' => 'teaser',
       'tabs[1][node][hide_title]' => 1,
     );
-    $saved['tabs'] = array(0 => array('type' => 'node', 'nid' => 4, 'title' => $tab_title_second, 'weight' => 0, 'view_mode' => 'teaser', 'hide_title' => 1), 1 => array('type' => 'node', 'nid' => 3, 'title' => $tab_title_first, 'weight' => 1, 'view_mode' => 'teaser', 'hide_title' => 0));
+    $saved['tabs'] = array(
+      0 => array(
+        'type' => 'node',
+        'nid' => 4,
+        'title' => $tab_title_second,
+        'weight' => 0,
+        'view_mode' => 'teaser',
+        'hide_title' => 1
+      ),
+      1 => array(
+        'type' => 'node',
+        'nid' => 3,
+        'title' => $tab_title_first,
+        'weight' => 1,
+        'view_mode' => 'teaser',
+        'hide_title' => 0
+      )
+    );
     $this->backdropPost('admin/structure/quicktabs/manage/'. $quicktabs->machine_name .'/edit', $edit, t('Save'));
 
     // Check that the quicktabs object is saved.

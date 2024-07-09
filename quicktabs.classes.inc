@@ -188,12 +188,15 @@ class QuickSet {
       foreach ($this->contents as $key => $tab) {
         $contents = $tab->render(TRUE);
         reset($contents);
+        $output = '';
         if (!empty($contents)) {
-          // If it's block type quicktab, #markup will be on level lower.
           if (!isset($contents['#markup'])) {
-            $contents = reset($contents);
+            $output = backdrop_render($contents);
           }
-          $string = strip_tags($contents['#markup']);
+          else {
+            $output = $contents['#markup'];
+          }
+          $string = strip_tags($output);
           // If string contains only whitespaces it will be removed.
           $string = trim($string);
         }
