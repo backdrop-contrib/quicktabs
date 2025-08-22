@@ -7,6 +7,17 @@
  * http://benalman.com/about/license/
  */
 
+/*
+ * Additional changes to this file:
+ * - Removed support for IE8 and below https://github.com/cowboy/jquery-bbq/pull/48
+ * - Fixed prototype pollution (CVE-2021-20086) https://github.com/cowboy/jquery-bbq/pull/61
+ * - Minified with `uglifyjs jquery.ba-bbq.js --compress --comments -o jquery.ba-bbq.min.js`
+ *
+ * See Yii Framework which is also maintaining a fork: https://github.com/yiisoft/yii/pull/4563
+ *
+ * The version is incorrectly marked; it should be 1.4pre.
+ */
+
 // Script: jQuery BBQ: Back Button & Query Library
 //
 // *Version: 1.3pre, Last updated: 8/26/2010*
@@ -464,7 +475,7 @@
   //  (Object) An object representing the deserialized params string.
 
   $.deparam = jq_deparam = function( params, coerce ) {
-    var obj = {},
+    var obj = Object.create(null),
       coerce_types = { 'true': !0, 'false': !1, 'null': null };
 
     // Iterate over all name=value pairs.
@@ -521,7 +532,7 @@
           for ( ; i <= keys_last; i++ ) {
             key = keys[i] === '' ? cur.length : keys[i];
             cur = cur[key] = i < keys_last
-              ? cur[key] || ( keys[i+1] && isNaN( keys[i+1] ) ? {} : [] )
+              ? cur[key] || ( keys[i+1] && isNaN( keys[i+1] ) ? Object.create(null) : [] )
               : val;
           }
 

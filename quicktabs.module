@@ -183,9 +183,9 @@ function quicktabs_library_info() {
   $libraries['jquery.bbq'] = array(
     'title' => 'Enables bookmarkable #hash history.',
     'website' => 'https://github.com/cowboy/jquery-bbq',
-    'version' => 1.0,
+    'version' => '1.4pre',
     'js' => array(
-      $module_path . '/js/jquery.ba-bbq.js' => array(),
+      $module_path . '/js/jquery.ba-bbq.min.js' => array(),
     ),
     'dependencies' => array(
       array('system', 'jquery'),
