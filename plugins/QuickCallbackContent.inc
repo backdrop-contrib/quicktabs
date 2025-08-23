@@ -38,6 +38,7 @@ class QuickCallbackContent extends QuickContent {
       '#type' => 'textfield',
       '#default_value' => isset($tab['path']) ? $tab['path'] : '',
       '#title' => t('Path'),
+      '#description' => t('An existing system path that calls the custom callback.'),
       '#element_validate' => array(array($this, 'elementValidatePath')),
     );
     $form['callback']['use_title'] = array(

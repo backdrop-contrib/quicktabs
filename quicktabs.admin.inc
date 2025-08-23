@@ -457,6 +457,11 @@ function quicktabs_form_validate($form, &$form_state) {
       }
     }
   }
+  foreach ($form_state['values']['tabs'] as $j => $tab) {
+    if (!isset($tab[$tab['type']])) {
+      form_set_error('tabs][' . $j . '][title', t('The tab content must not be empty. Select a different tab type or create content for it first.'));
+    }
+  }
 }
 
 /**
@@ -501,7 +506,10 @@ function quicktabs_block_delete_submit($form, &$form_state) {
 };
 
 /**
- * Helper function to get all blocks.
+ * Helper function to get all custom blocks.
+ *
+ * @return array
+ *   Array of custom blocks.
  */
 function quicktabs_get_blocks() {
   $blocksarray = array();

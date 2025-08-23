@@ -20,13 +20,22 @@ class QuickQtabsContent extends QuickContent {
         $tab_options[$machine_name] = $info->title;
       }
     }
-    $form['qtabs']['machine_name'] = array(
-      '#type' => 'select',
-      '#title' => t('Quicktabs instance'),
-      '#description' => t('The Quicktabs instance to put inside this tab.'),
-      '#options' => $tab_options,
-      '#default_value' => isset($tab['machine_name']) ? $tab['machine_name'] : '',
-    );
+
+    if ($tab_options) {
+      $form['qtabs']['machine_name'] = array(
+        '#type' => 'select',
+        '#title' => t('Quicktabs instance'),
+        '#description' => t('The Quicktabs instance to put inside this tab.'),
+        '#options' => $tab_options,
+        '#default_value' => isset($tab['machine_name']) ? $tab['machine_name'] : '',
+      );
+    }
+    else {
+      $form['qtabs']['machine_name'] = array(
+        '#type' => 'markup',
+        '#markup' => t('No other quicktab instances found.'),
+      );
+    }
     return $form;
   }
 

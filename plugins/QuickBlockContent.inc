@@ -13,17 +13,28 @@ class QuickBlockContent extends QuickContent {
   public function optionsForm($delta, $qt) {
     $tab = $this->settings;
     $form = array();
-    $form['block']['bid'] = array(
-      '#type' => 'select',
-      '#options' => quicktabs_get_blocks(),
-      '#default_value' => isset($tab['bid']) ? $tab['bid'] : '',
-      '#title' => t('Select a block'),
-    );
-    $form['block']['hide_title'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Hide the title of this block'),
-      '#default_value' => isset($tab['hide_title']) ? $tab['hide_title'] : 1,
-    );
+    $blocks = quicktabs_get_blocks();
+
+    if ($blocks) {
+      $form['block']['bid'] = array(
+        '#type' => 'select',
+        '#options' => $blocks,
+        '#default_value' => isset($tab['bid']) ? $tab['bid'] : '',
+        '#title' => t('Select a block'),
+      );
+      $form['block']['hide_title'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Hide the title of this block'),
+        '#default_value' => isset($tab['hide_title']) ? $tab['hide_title'] : 1,
+      );
+    }
+    else {
+      $form['block']['bid'] = array(
+        '#type' => 'markup',
+        '#markup' => t('No custom blocks found. <a href="!url">Add a custom block</a> first.', array('!url' => url('admin/structure/block'))),
+      );
+    }
+
     return $form;
   }
 
