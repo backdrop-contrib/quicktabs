@@ -311,7 +311,7 @@ function _quicktabs_form(array $tab, $qt) {
         if (!module_exists($dep)) continue 2;
       }
     }
-    $tabtypes[$name] = !empty($info['plugin_name']) ? $info['plugin_name'] : $name;
+    $tabtypes[$name] = $info['defaults']['title'] ?? $name;
     $content_provider = quick_content_factory($name, $tab);
     if (is_object($content_provider)) {
       $form = array_merge_recursive($form, $content_provider->optionsForm($delta, $qt));
