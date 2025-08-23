@@ -500,6 +500,7 @@ function quicktabs_plugin_manager_plugin_type() {
     ),
     // Content plugins control the display of individual items.
     'contents' => array(
+      'plugin_title' => '',
       'cache' => TRUE,
       'use hooks' => TRUE,
       'classes' => array('handler'),
@@ -544,6 +545,7 @@ function quicktabs_quicktabs_contents() {
   $info = array();
   $path = backdrop_get_path('module', 'quicktabs') . '/plugins';
   $info['node'] = array(
+    'plugin_name' => t('Content'),
     'path' => $path,
     'handler' => array(
       'file' => 'QuickNodeContent.inc',
@@ -551,6 +553,7 @@ function quicktabs_quicktabs_contents() {
     ),
   );
   $info['block'] = array(
+    'plugin_name' => t('Custom block'),
     'path' => $path,
     'handler' => array(
       'file' => 'QuickBlockContent.inc',
@@ -559,6 +562,7 @@ function quicktabs_quicktabs_contents() {
     'dependencies' => array('block'),
   );
   $info['view'] = array(
+    'plugin_name' => t('View'),
     'path' => $path,
     'handler' => array(
       'file' => 'QuickViewContent.inc',
@@ -567,6 +571,7 @@ function quicktabs_quicktabs_contents() {
     'dependencies' => array('views'),
   );
   $info['qtabs'] = array(
+    'plugin_name' => t('Quicktab'),
     'path' => $path,
     'handler' => array(
       'file' => 'QuickQtabsContent.inc',
@@ -574,6 +579,7 @@ function quicktabs_quicktabs_contents() {
     ),
   );
   $info['callback'] = array(
+    'plugin_name' => t('Custom callback'),
     'path' => $path,
     'handler' => array(
       'file' => 'QuickCallbackContent.inc',

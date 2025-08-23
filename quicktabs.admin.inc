@@ -303,6 +303,7 @@ function _quicktabs_form(array $tab, $qt) {
 
   // Load all "contents" plugins to display a choice of content types.
   $contents = plugin_manager_get_plugins('quicktabs', 'contents');
+  $tabtypes = array();
   foreach ($contents as $name => $info) {
     if (isset($info['dependencies'])) {
       foreach ($info['dependencies'] as $dep) {
@@ -310,10 +311,7 @@ function _quicktabs_form(array $tab, $qt) {
         if (!module_exists($dep)) continue 2;
       }
     }
-    $tabtypes[$name] = $name;
-    if ($tabtypes[$name] == 'block') {
-      $tabtypes[$name] = 'custom block';
-    }
+    $tabtypes[$name] = $info['plugin_name'];
     $content_provider = quick_content_factory($name, $tab);
     if (is_object($content_provider)) {
       $form = array_merge_recursive($form, $content_provider->optionsForm($delta, $qt));
@@ -377,10 +375,10 @@ function theme_quicktabs_admin_form_tabs($variables) {
 
     // content plugins
     $content_plugins = '';
-    foreach ($tab['type']['#options'] as $content_provider ) {
-      $tab[$content_provider]['#prefix'] = '<div class="qt-tab-options-form qt-tab-'. $content_provider .'-options-form">';
-      $tab[$content_provider]['#suffix'] = '</div>';
-      $content_plugins .= backdrop_render($tab[$content_provider]);
+    foreach ($tab['type']['#options'] as $content_provider_name => $content_provider ) {
+      $tab[$content_provider_name]['#prefix'] = '<div class="qt-tab-options-form qt-tab-'. $content_provider_name .'-options-form">';
+      $tab[$content_provider_name]['#suffix'] = '</div>';
+      $content_plugins .= backdrop_render($tab[$content_provider_name]);
     }
     $tab_fields[] = array('data' => $content_plugins);
     $tab_fields[] = array('data' => backdrop_render($tab['remove']), 'class' => array('qt-tab-remove'));

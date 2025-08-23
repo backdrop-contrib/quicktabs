@@ -22,8 +22,8 @@ class QuickNodeContent extends QuickContent {
 
     $form['node']['nid'] = array(
       '#type' => 'textfield',
-      '#title' => t('Node'),
-      '#description' => t('The node ID of the node. Start typing to see a list of suggestions.'),
+      '#title' => t('Content node'),
+      '#description' => t('The content node ID of the content. Start typing to see a list of suggestions.'),
       '#placeholder' => ' ',
       '#autocomplete_path' => 'node/autocomplete',
       '#maxlength' => 512,
@@ -44,7 +44,7 @@ class QuickNodeContent extends QuickContent {
     );
     $form['node']['hide_title'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Hide the title of this node'),
+      '#title' => t('Hide the title of this content'),
       '#default_value' => isset($tab['hide_title']) ? $tab['hide_title'] : 1,
     );
     if (module_exists('translation')) {
