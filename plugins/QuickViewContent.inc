@@ -122,6 +122,9 @@ class QuickViewContent extends QuickContent {
           if ($view->access($item['display'])) {
             $view->set_display($item['display']);
             $view->set_arguments($item['actual_args']);
+            if ($view->display_handler->get_option('inherit_path')) {
+              $view->override_path = $_GET['q'];
+            }
             $view_output = $view->preview();
             if (!empty($view->result) || $view->display_handler->get_option('empty') || !empty($view->style_plugin->definition['even empty'])) {
               $output['#markup'] = $view_output;
