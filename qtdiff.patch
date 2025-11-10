@@ -1,0 +1,138 @@
+diff --git a/js/quicktabs.js b/js/quicktabs.js
+index d982f1864..0284b39dc 100644
+--- a/js/quicktabs.js
++++ b/js/quicktabs.js
+@@ -45,6 +45,10 @@ Backdrop.quicktabs.clickHandler = function(event) {
+   $(this).parents('li').siblings().removeClass('active');
+   $(this).parents('li').addClass('active');
+ 
++  // Set clicked tab to aria-selected.
++  $(this).parents('li').siblings().attr('aria-selected', 'false');
++  $(this).parents('li').attr('aria-selected', 'true');
++
+   $("ul.quicktabs-tabs li a span#active-quicktabs-tab").remove();
+   $(this).append('<span id="active-quicktabs-tab" class="element-invisible">' + Backdrop.t('(active tab)') + '</span>');
+ 
+diff --git a/plugins/QuickQuicktabs.inc b/plugins/QuickQuicktabs.inc
+index b178a2dbe..30c6dcc69 100644
+--- a/plugins/QuickQuicktabs.inc
++++ b/plugins/QuickQuicktabs.inc
+@@ -19,16 +19,35 @@ class QuickQuicktabs extends QuickRenderer {
+       $settings = $quickset->getSettings();
+       $contents = $quickset->getContents();
+ 
++      $container_attributes = array(
++        'id' => 'quicktabs-container-' . $qt_name,
++        'role' => 'region',
++        'aria-label' => $qt_name . ' tabs',
++        'class' => array(
++          'quicktabs_main',
++          'quicktabs-style-' . backdrop_html_class($settings['style']),
++        ),
++      );
++
+       $render_array['content'] = array(
+         '#theme' => 'qt_quicktabs',
+         '#options' => array('attributes' => array(
+           'id' => 'quicktabs-' . $qt_name,
+-          'class' => 'quicktabs-wrapper quicktabs-style-' . backdrop_html_class($settings['style']),
++          'class' => array(
++            'quicktabs-wrapper',
++            'quicktabs-style-' . backdrop_html_class($settings['style'])),
+         )),
+-        'tabs' => array('#theme' => 'qt_quicktabs_tabset', '#options' => array('active' => $active_tab, 'style' => backdrop_html_class($settings['style'])), 'tablinks' => $tabs),
++        'tabs' => array(
++          '#theme' => 'qt_quicktabs_tabset',
++          '#options' => array(
++            'active' => $active_tab,
++            'style' => backdrop_html_class($settings['style']),
++          ),
++          'tablinks' => $tabs,
++        ),
+         // The main content area, each quicktab container needs a unique id.
+         'container' => array(
+-          '#prefix' => '<div id="quicktabs-container-' . $qt_name .'" class="quicktabs_main quicktabs-style-' . backdrop_html_class($settings['style']) .'">',
++          '#prefix' => '<div' . backdrop_attributes($container_attributes) . '>',
+           '#suffix' => '</div>',
+           'divs' => array(),
+         ),
+@@ -38,7 +57,8 @@ class QuickQuicktabs extends QuickRenderer {
+       if ($settings['ajax']){
+         // check in case of $active_tab=QUICKTABS_DELTA_NONE
+         $tabs_to_render = isset ($contents[$active_tab]) ? array($active_tab => $contents[$active_tab]) : array ();
+-      }else{
++      }
++      else{
+         $tabs_to_render = $contents;
+       }
+ 
+@@ -46,6 +66,7 @@ class QuickQuicktabs extends QuickRenderer {
+         if (!empty($tab)) {
+           $attribs = array(
+             'id' => 'quicktabs-tabpage-'. $qt_name . '-'. $key,
++            'role' => 'tabpanel',
+             'class' => array('quicktabs-tabpage', ($active_tab == $key ? '' : 'quicktabs-hide')),
+           );
+           $render_array['content']['container']['divs'][] = array(
+@@ -56,6 +77,7 @@ class QuickQuicktabs extends QuickRenderer {
+         }
+       }
+     }
++
+     return $render_array;
+   }
+ 
+diff --git a/quicktabs.module b/quicktabs.module
+index 16a3e165a..699de1113 100644
+--- a/quicktabs.module
++++ b/quicktabs.module
+@@ -724,19 +724,29 @@ function theme_qt_ui_tabs($variables) {
+  */
+ function theme_qt_quicktabs_tabset($vars) {
+   $variables = array(
++    'items' => array(),
+     'attributes' => array(
+-      'class' => 'quicktabs-tabs quicktabs-style-' . $vars['tabset']['#options']['style'],
++      'role' => 'tablist',
++      'class' => array(
++        'quicktabs-tabs',
++        'quicktabs-style-' . $vars['tabset']['#options']['style'],
++      ),
+     ),
+-    'items' => array(),
+   );
+   foreach (element_children($vars['tabset']['tablinks']) as $key) {
+     $item = array();
+     if (is_array($vars['tabset']['tablinks'][$key])) {
+       $tab = $vars['tabset']['tablinks'][$key];
++      $tab['#attributes'] = array('role' => 'tab');
++      $tab['#attributes']['aria-selected'] = 'false';
++
++      $item['class'] = array(backdrop_html_class($tab['#title']));
+       if ($key == $vars['tabset']['#options']['active']) {
+-        $item['class'] = array('active');
++        $item['class'][] = array('active');
++        $item['aria-selected'] = 'true';
++        $tab['#attributes']['aria-selected'] = 'true';
+       }
+-      $item['class'][] = backdrop_html_class($tab['#title']);
++      $item['role'] = 'presentation';
+       $item['data'] = backdrop_render($tab);
+       $variables['items'][] = $item;
+     }
+@@ -751,12 +761,13 @@ function theme_qt_quicktabs_tabset($vars) {
+  */
+ function theme_qt_quicktabs($variables) {
+   $element = $variables['element'];
++  $element['#options']['attributes']['role'] = 'tabpanel';
++
+   $output = '<div '. backdrop_attributes($element['#options']['attributes']) .'>';
+   $output .= backdrop_render($element['tabs']);
+-
+   $output .= backdrop_render($element['container']);
+-
+   $output .= '</div>';
++
+   return $output;
+ }
+ 

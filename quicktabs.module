@@ -724,19 +724,29 @@ function theme_qt_ui_tabs($variables) {
  */
 function theme_qt_quicktabs_tabset($vars) {
   $variables = array(
-    'attributes' => array(
-      'class' => 'quicktabs-tabs quicktabs-style-' . $vars['tabset']['#options']['style'],
-    ),
     'items' => array(),
+    'attributes' => array(
+      'role' => 'tablist',
+      'class' => array(
+        'quicktabs-tabs',
+        'quicktabs-style-' . $vars['tabset']['#options']['style'],
+      ),
+    ),
   );
   foreach (element_children($vars['tabset']['tablinks']) as $key) {
     $item = array();
     if (is_array($vars['tabset']['tablinks'][$key])) {
       $tab = $vars['tabset']['tablinks'][$key];
+      $tab['#attributes'] = array('role' => 'tab');
+      $tab['#attributes']['aria-selected'] = 'false';
+
+      $item['class'] = array(backdrop_html_class($tab['#title']));
       if ($key == $vars['tabset']['#options']['active']) {
-        $item['class'] = array('active');
+        $item['class'][] = 'active';
+        $item['aria-selected'] = 'true';
+        $tab['#attributes']['aria-selected'] = 'true';
       }
-      $item['class'][] = backdrop_html_class($tab['#title']);
+      $item['role'] = 'presentation';
       $item['data'] = backdrop_render($tab);
       $variables['items'][] = $item;
     }
@@ -751,12 +761,12 @@ function theme_qt_quicktabs_tabset($vars) {
  */
 function theme_qt_quicktabs($variables) {
   $element = $variables['element'];
+
   $output = '<div '. backdrop_attributes($element['#options']['attributes']) .'>';
   $output .= backdrop_render($element['tabs']);
-
   $output .= backdrop_render($element['container']);
-
   $output .= '</div>';
+
   return $output;
 }
 

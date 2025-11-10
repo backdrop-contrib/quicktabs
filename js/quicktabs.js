@@ -45,6 +45,10 @@ Backdrop.quicktabs.clickHandler = function(event) {
   $(this).parents('li').siblings().removeClass('active');
   $(this).parents('li').addClass('active');
 
+  // Set clicked tab to aria-selected.
+  $(this).parents('li').siblings().attr('aria-selected', 'false');
+  $(this).parents('li').attr('aria-selected', 'true');
+
   $("ul.quicktabs-tabs li a span#active-quicktabs-tab").remove();
   $(this).append('<span id="active-quicktabs-tab" class="element-invisible">' + Backdrop.t('(active tab)') + '</span>');
 
