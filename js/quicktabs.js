@@ -22,13 +22,14 @@ Backdrop.quicktabs.prepare = function(el) {
   var qt_name = Backdrop.quicktabs.getQTName(el);
   var $ul = $(el).find('ul.quicktabs-tabs:first');
 
-  $("ul.quicktabs-tabs li a span#active-quicktabs-tab").remove();
+  $("ul.quicktabs-tabs li button[data-qt] span#active-quicktabs-tab").remove();
 
-  $ul.find('li a').each(function(i, element){
+  $ul.find('button[data-qt]').each(function(i, element){
     element.myTabIndex = i;
     element.qt_name = qt_name;
 
     var tab = new Backdrop.quicktabs.tab(element);
+    console.log($(element));
     var parent_li = $(element).parents('li').get(0);
     if ($(parent_li).hasClass('active')) {
       $(element).addClass('quicktabs-loaded');
@@ -45,7 +46,11 @@ Backdrop.quicktabs.clickHandler = function(event) {
   $(this).parents('li').siblings().removeClass('active');
   $(this).parents('li').addClass('active');
 
-  $("ul.quicktabs-tabs li a span#active-quicktabs-tab").remove();
+  // Set clicked tab to aria-selected.
+  $(this).parents('li').siblings().attr('aria-selected', 'false');
+  $(this).parents('li').attr('aria-selected', 'true');
+
+  $("ul.quicktabs-tabs li button[data-qt] span#active-quicktabs-tab").remove();
   $(this).append('<span id="active-quicktabs-tab" class="element-invisible">' + Backdrop.t('(active tab)') + '</span>');
 
   // Hide all tabpages.

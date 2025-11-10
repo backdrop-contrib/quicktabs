@@ -19,16 +19,35 @@ class QuickQuicktabs extends QuickRenderer {
       $settings = $quickset->getSettings();
       $contents = $quickset->getContents();
 
+      $container_attributes = array(
+        'id' => 'quicktabs-container-' . $qt_name,
+        'role' => 'region',
+        'aria-label' => $qt_name . ' tabs',
+        'class' => array(
+          'quicktabs_main',
+          'quicktabs-style-' . backdrop_html_class($settings['style']),
+        ),
+      );
+
       $render_array['content'] = array(
         '#theme' => 'qt_quicktabs',
         '#options' => array('attributes' => array(
           'id' => 'quicktabs-' . $qt_name,
-          'class' => 'quicktabs-wrapper quicktabs-style-' . backdrop_html_class($settings['style']),
+          'class' => array(
+            'quicktabs-wrapper',
+            'quicktabs-style-' . backdrop_html_class($settings['style'])),
         )),
-        'tabs' => array('#theme' => 'qt_quicktabs_tabset', '#options' => array('active' => $active_tab, 'style' => backdrop_html_class($settings['style'])), 'tablinks' => $tabs),
+        'tabs' => array(
+          '#theme' => 'qt_quicktabs_tabset',
+          '#options' => array(
+            'active' => $active_tab,
+            'style' => backdrop_html_class($settings['style']),
+          ),
+          'tablinks' => $tabs,
+        ),
         // The main content area, each quicktab container needs a unique id.
         'container' => array(
-          '#prefix' => '<div id="quicktabs-container-' . $qt_name .'" class="quicktabs_main quicktabs-style-' . backdrop_html_class($settings['style']) .'">',
+          '#prefix' => '<div' . backdrop_attributes($container_attributes) . '>',
           '#suffix' => '</div>',
           'divs' => array(),
         ),
@@ -38,7 +57,8 @@ class QuickQuicktabs extends QuickRenderer {
       if ($settings['ajax']){
         // check in case of $active_tab=QUICKTABS_DELTA_NONE
         $tabs_to_render = isset ($contents[$active_tab]) ? array($active_tab => $contents[$active_tab]) : array ();
-      }else{
+      }
+      else{
         $tabs_to_render = $contents;
       }
 
@@ -46,6 +66,7 @@ class QuickQuicktabs extends QuickRenderer {
         if (!empty($tab)) {
           $attribs = array(
             'id' => 'quicktabs-tabpage-'. $qt_name . '-'. $key,
+            'role' => 'tabpanel',
             'class' => array('quicktabs-tabpage', ($active_tab == $key ? '' : 'quicktabs-hide')),
           );
           $render_array['content']['container']['divs'][] = array(
@@ -56,6 +77,7 @@ class QuickQuicktabs extends QuickRenderer {
         }
       }
     }
+
     return $render_array;
   }
 
