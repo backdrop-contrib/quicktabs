@@ -760,6 +760,28 @@ function theme_qt_quicktabs($variables) {
   return $output;
 }
 
+/**
+ * Implements hook_form_FORM_ID_alter() for Views exposed forms.
+ *
+ * If the display uses "Inherit path from the page" (Views block option), make
+ * the exposed form submit to the current page and set the View's override path.
+ */
+function quicktabs_form_views_exposed_form_alter(&$form, &$form_state) {
+  if (empty($form_state['view']) || empty($form_state['display'])) {
+    return;
+  }
+  $view = $form_state['view'];
+
+  // Only adjust for block displays, and only when "Inherit path" is enabled.
+  if (!empty($view->display_handler) && $view->display_handler->plugin_name === 'block') {
+    if ($view->display_handler->get_option('inherit_path')) {
+      // Force the exposed form to submit to the current page.
+      $form['#action'] = url(current_path(), array('absolute' => TRUE));
+      // Also set override_path so pager/sort links match the current page.
+      $view->override_path = isset($_GET['q']) ? $_GET['q'] : current_path();
+    }
+  }
+}
 
 /**
  * Theme function to output markup for the accordion style.
@@ -776,3 +798,4 @@ function theme_qt_accordion($variables) {
   $output .= '</div>';
   return $output;
 }
+
