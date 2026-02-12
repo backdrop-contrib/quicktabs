@@ -6,6 +6,17 @@
  */
 class QuickQuicktabs extends QuickRenderer {
 
+  public static function optionsForm($qt) {
+    $form = array();
+    $form['history'] = array(
+      '#type' => 'checkbox',
+      '#title' => 'History',
+      '#description' => t('Store tab state in the URL allowing for browser back / forward and bookmarks.'),
+      '#default_value' => (isset($qt->renderer) && $qt->renderer == 'quicktabs' && isset($qt->options['history']) && $qt->options['history']),
+    );
+    return $form;
+  }
+
   public function render() {
     $quickset = $this->quickset;
 
@@ -19,16 +30,35 @@ class QuickQuicktabs extends QuickRenderer {
       $settings = $quickset->getSettings();
       $contents = $quickset->getContents();
 
+      $container_attributes = array(
+        'id' => 'quicktabs-container-' . $qt_name,
+        'role' => 'region',
+        'aria-label' => $qt_name . ' tabs',
+        'class' => array(
+          'quicktabs_main',
+          'quicktabs-style-' . backdrop_html_class($settings['style']),
+        ),
+      );
+
       $render_array['content'] = array(
         '#theme' => 'qt_quicktabs',
         '#options' => array('attributes' => array(
           'id' => 'quicktabs-' . $qt_name,
-          'class' => 'quicktabs-wrapper quicktabs-style-' . backdrop_html_class($settings['style']),
+          'class' => array(
+            'quicktabs-wrapper',
+            'quicktabs-style-' . backdrop_html_class($settings['style'])),
         )),
-        'tabs' => array('#theme' => 'qt_quicktabs_tabset', '#options' => array('active' => $active_tab, 'style' => backdrop_html_class($settings['style'])), 'tablinks' => $tabs),
+        'tabs' => array(
+          '#theme' => 'qt_quicktabs_tabset',
+          '#options' => array(
+            'active' => $active_tab,
+            'style' => backdrop_html_class($settings['style']),
+          ),
+          'tablinks' => $tabs,
+        ),
         // The main content area, each quicktab container needs a unique id.
         'container' => array(
-          '#prefix' => '<div id="quicktabs-container-' . $qt_name .'" class="quicktabs_main quicktabs-style-' . backdrop_html_class($settings['style']) .'">',
+          '#prefix' => '<div' . backdrop_attributes($container_attributes) . '>',
           '#suffix' => '</div>',
           'divs' => array(),
         ),
@@ -38,7 +68,8 @@ class QuickQuicktabs extends QuickRenderer {
       if ($settings['ajax']){
         // check in case of $active_tab=QUICKTABS_DELTA_NONE
         $tabs_to_render = isset ($contents[$active_tab]) ? array($active_tab => $contents[$active_tab]) : array ();
-      }else{
+      }
+      else{
         $tabs_to_render = $contents;
       }
 
@@ -46,6 +77,7 @@ class QuickQuicktabs extends QuickRenderer {
         if (!empty($tab)) {
           $attribs = array(
             'id' => 'quicktabs-tabpage-'. $qt_name . '-'. $key,
+            'role' => 'tabpanel',
             'class' => array('quicktabs-tabpage', ($active_tab == $key ? '' : 'quicktabs-hide')),
           );
           $render_array['content']['container']['divs'][] = array(
@@ -56,6 +88,7 @@ class QuickQuicktabs extends QuickRenderer {
         }
       }
     }
+
     return $render_array;
   }
 
@@ -106,11 +139,19 @@ class QuickQuicktabs extends QuickRenderer {
       ),
     );
     $settings = $this->quickset->getSettings();
+    $options = $settings['options'];
+
     // Add the custom style css if a custom style has been set.
     $style_css = quicktabs_get_css($settings['style']);
     if (!empty($style_css)) {
       $attached['css'][] = $style_css;
     }
+
+    // Add BBQ library if history is enabled.
+    if (!empty($options['history'])) {
+      $attached['library'][] = array('quicktabs', 'quicktabs.bbq');
+    }
+
     // Prepare a tab_settings array for passing the tab info to our JavaScript.
     $tab_settings = array();
     foreach ($this->quickset->getContents() as $i => $content) {
@@ -131,7 +172,12 @@ class QuickQuicktabs extends QuickRenderer {
     $name = $this->quickset->getName();
     if (!isset($qtkey) || (isset($javascript['settings']['data'][$qtkey]['quicktabs'])
       && !array_key_exists('qt_' . $name, $javascript['settings']['data'][$qtkey]['quicktabs']))) {
-      $quicktabs_array = array_merge(array('name' => $name, 'tabs' => $tab_settings), $settings);
+      $quicktabs_array = array(
+        'name' => $name,
+        'tabs' => $tab_settings,
+        'ajax' => $settings['ajax'],
+        'history' => !empty($options['history']) ? $options['history'] : FALSE,
+      );
       $attached['js'][] = array('data' => array('quicktabs' => array('qt_' . $name => $quicktabs_array)), 'type' => 'setting');
     }
     return $attached;

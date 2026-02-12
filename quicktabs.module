@@ -162,7 +162,7 @@ function quicktabs_block_info() {
 /**
  * Implements hook_block_view().
  */
-function quicktabs_block_view($delta = '') {
+function quicktabs_block_view($delta = '', $settings = array(), $contexts = array()) {
   $block = array();
   if ($qt = quicktabs_build_quicktabs($delta)) {
     if (isset($qt['content']) && !empty($qt['content'])) {
@@ -197,6 +197,7 @@ function quicktabs_library_info() {
     'version' => 1.0,
     'js' => array(
       $module_path . '/js/quicktabs_bbq.js' => array(),
+      $module_path . '/js/quicktabs_hash_preserve.js' => array(),
     ),
     'dependencies' => array(
       array('quicktabs', 'jquery.bbq'),
@@ -724,19 +725,29 @@ function theme_qt_ui_tabs($variables) {
  */
 function theme_qt_quicktabs_tabset($vars) {
   $variables = array(
-    'attributes' => array(
-      'class' => 'quicktabs-tabs quicktabs-style-' . $vars['tabset']['#options']['style'],
-    ),
     'items' => array(),
+    'attributes' => array(
+      'role' => 'tablist',
+      'class' => array(
+        'quicktabs-tabs',
+        'quicktabs-style-' . $vars['tabset']['#options']['style'],
+      ),
+    ),
   );
   foreach (element_children($vars['tabset']['tablinks']) as $key) {
     $item = array();
     if (is_array($vars['tabset']['tablinks'][$key])) {
       $tab = $vars['tabset']['tablinks'][$key];
+      $tab['#attributes'] = array('role' => 'tab');
+      $tab['#attributes']['aria-selected'] = 'false';
+
+      $item['class'] = array(backdrop_html_class($tab['#title']));
       if ($key == $vars['tabset']['#options']['active']) {
-        $item['class'] = array('active');
+        $item['class'][] = 'active';
+        $item['aria-selected'] = 'true';
+        $tab['#attributes']['aria-selected'] = 'true';
       }
-      $item['class'][] = backdrop_html_class($tab['#title']);
+      $item['role'] = 'presentation';
       $item['data'] = backdrop_render($tab);
       $variables['items'][] = $item;
     }
@@ -751,12 +762,12 @@ function theme_qt_quicktabs_tabset($vars) {
  */
 function theme_qt_quicktabs($variables) {
   $element = $variables['element'];
+
   $output = '<div '. backdrop_attributes($element['#options']['attributes']) .'>';
   $output .= backdrop_render($element['tabs']);
-
   $output .= backdrop_render($element['container']);
-
   $output .= '</div>';
+
   return $output;
 }
 
@@ -775,4 +786,27 @@ function theme_qt_accordion($variables) {
 
   $output .= '</div>';
   return $output;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter() for Views exposed forms.
+ *
+ * If the display uses "Inherit path from the page" (Views block option), make
+ * the exposed form submit to the current page and set the View's override path.
+ */
+function quicktabs_form_views_exposed_form_alter(&$form, &$form_state) {
+  if (empty($form_state['view']) || empty($form_state['display'])) {
+    return;
+  }
+  $view = $form_state['view'];
+
+  // Only adjust for block displays, and only when "Inherit path" is enabled.
+  if (!empty($view->display_handler) && $view->display_handler->plugin_name === 'block') {
+    if ($view->display_handler->get_option('inherit_path')) {
+      // Force the exposed form to submit to the current page.
+      $form['#action'] = url(current_path(), array('absolute' => TRUE));
+      // Also set override_path so pager/sort links match the current page.
+      $view->override_path = isset($_GET['q']) ? $_GET['q'] : current_path();
+    }
+  }
 }
