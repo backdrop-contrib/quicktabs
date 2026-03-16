@@ -162,8 +162,8 @@ class QuickQuicktabs extends QuickRenderer {
     // Add our JS settings
     $javascript = backdrop_add_js();
     if (isset($javascript['settings']['data'])) {
-      foreach ($javascript['settings']['data'] as $key => $settings) {
-        if (key($settings) == 'quicktabs') {
+      foreach ($javascript['settings']['data'] as $key => $js_settings) {
+        if (key($js_settings) == 'quicktabs') {
           $qtkey = $key;
           break;
         }
