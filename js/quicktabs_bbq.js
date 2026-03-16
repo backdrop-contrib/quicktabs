@@ -5,12 +5,17 @@
  */
 (function($) {
 
-Backdrop.quicktabsBbq = function($tabset, clickSelector, changeSelector) {
+Backdrop.quicktabsBbq = function($tabset, clickSelector, changeSelector, clickHandler) {
 
   changeSelector = changeSelector || clickSelector;
 
+  // Find all clickable elements.
+  // Supports both direct selector string and jQuery object used by quicktabs
+  // renderer to handle both 'li a' and 'li button' possible markup.
+  var $clickElements = typeof clickSelector === 'string' ? $(clickSelector, $tabset) : $tabset.find(clickSelector);
+
   // Define our own click handler for the tabs, overriding the default.
-  $(clickSelector, $tabset).each(function(i, el){
+  $clickElements.each(function(i, el){
     this.tabIndex = i;
     $(this).click(function(e){
       e.preventDefault();
@@ -26,8 +31,23 @@ Backdrop.quicktabsBbq = function($tabset, clickSelector, changeSelector) {
   $(window).bind('hashchange', function(e) {
     $tabset.each(function() {
       var idx = $.bbq.getState(this.id, true);
-      var $active_link = $(this).find(changeSelector).eq(idx);
-      $active_link.triggerHandler('change');
+
+      // Find the active element using the changeSelector
+      var $active_element;
+      if (typeof changeSelector === 'string') {
+        $active_element = $(this).find(changeSelector).eq(idx);
+      } else {
+        $active_element = $clickElements.eq(idx);
+      }
+
+      $active_element.triggerHandler('change');
+
+      // If a custom click handler is provided, call it.
+      // Quicktabs renderer provides a custom click handler to handle history
+      // because it doesn't rely on jQuery UI's built-in behavior.
+      if (clickHandler && typeof clickHandler === 'function') {
+        clickHandler($active_element, idx);
+      }
     });
   });
 

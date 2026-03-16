@@ -11,20 +11,30 @@ Backdrop.behaviors.quicktabs = {
   attach: function (context, settings) {
     $.extend(true, Backdrop.settings, settings);
     $('.quicktabs-wrapper', context).once(function(){
-      Backdrop.quicktabs.prepare(this);
+      var qt_name = Backdrop.quicktabs.getQTName(this);
+      var qtKey = 'qt_' + qt_name;
+
+      if (settings.quicktabs && settings.quicktabs[qtKey] && settings.quicktabs[qtKey].history) {
+        // Use BBQ for history support.
+        Backdrop.quicktabs.prepareWithHistory(this);
+      }
+      else {
+        Backdrop.quicktabs.prepare(this);
+      }
     });
   }
 }
 
-// Setting up the inital behaviours
+// Setting up the initial behaviours.
 Backdrop.quicktabs.prepare = function(el) {
   // el.id format: "quicktabs-$name"
   var qt_name = Backdrop.quicktabs.getQTName(el);
   var $ul = $(el).find('ul.quicktabs-tabs:first');
 
-  $("ul.quicktabs-tabs li a span#active-quicktabs-tab").remove();
+  $("ul.quicktabs-tabs li span#active-quicktabs-tab").remove();
 
-  $ul.find('li a').each(function(i, element){
+  // Use flexible selector for both links and buttons.
+  $ul.find('li a, li button').each(function(i, element){
     element.myTabIndex = i;
     element.qt_name = qt_name;
 
@@ -38,6 +48,53 @@ Backdrop.quicktabs.prepare = function(el) {
   });
 }
 
+// Setting up behaviours with history support
+Backdrop.quicktabs.prepareWithHistory = function(el) {
+  var $wrapper = $(el);
+  var qt_name = Backdrop.quicktabs.getQTName(el);
+  var $tabsList = $wrapper.find('ul.quicktabs-tabs:first');
+
+  // Find all tab elements - flexible selector for both <a> and <button>.
+  // Standard structure is: ul.quicktabs-tabs > li > (a or button)
+  var tabSelector = 'ul.quicktabs-tabs li a, ul.quicktabs-tabs li button';
+  var $tabElements = $wrapper.find(tabSelector);
+
+  // Set up initial tab state.
+  $tabElements.each(function(i) {
+    this.myTabIndex = i;
+    this.qt_name = qt_name;
+  });
+
+  // Use BBQ for history with custom handler for quicktabs.
+  Backdrop.quicktabsBbq($wrapper, tabSelector, null, function($activeElement, idx) {
+    // Find the tab element by index if $activeElement is not found or empty.
+    if (!$activeElement || !$activeElement.length) {
+      $activeElement = $tabElements.eq(idx);
+    }
+
+    if ($activeElement && $activeElement.length) {
+      var element = $activeElement.get(0);
+      var $parentLi = $activeElement.closest('li');
+
+      // Manually switch tabs.
+      $tabsList.find('li').removeClass('active').attr('aria-selected', 'false');
+      $parentLi.addClass('active').attr('aria-selected', 'true');
+
+      // Update active tab marker.
+      $wrapper.find('span#active-quicktabs-tab').remove();
+      $activeElement.append('<span id="active-quicktabs-tab" class="element-invisible">' + Backdrop.t('(active tab)') + '</span>');
+
+      // Create tab object and show content
+      if (element.myTabIndex !== undefined) {
+        var tab = new Backdrop.quicktabs.tab(element);
+        tab.container.children().addClass('quicktabs-hide');
+        tab.tabpage.removeClass('quicktabs-hide');
+        $activeElement.trigger('switchtab');
+      }
+    }
+  });
+}
+
 Backdrop.quicktabs.clickHandler = function(event) {
   var tab = event.data.tab;
   var element = this;
@@ -45,7 +102,11 @@ Backdrop.quicktabs.clickHandler = function(event) {
   $(this).parents('li').siblings().removeClass('active');
   $(this).parents('li').addClass('active');
 
-  $("ul.quicktabs-tabs li a span#active-quicktabs-tab").remove();
+  // Set clicked tab to aria-selected.
+  $(this).parents('li').siblings().attr('aria-selected', 'false');
+  $(this).parents('li').attr('aria-selected', 'true');
+
+  $("ul.quicktabs-tabs li span#active-quicktabs-tab").remove();
   $(this).append('<span id="active-quicktabs-tab" class="element-invisible">' + Backdrop.t('(active tab)') + '</span>');
 
   // Hide all tabpages.
